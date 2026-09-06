@@ -3,7 +3,7 @@
  * Flexible text splitting utility for CSS animations.
  * Supports complex line breaking rules (ja: Kinsoku shori).
  *
- * @version 3.1.5
+ * @version 3.1.6
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -74,7 +74,7 @@ class MojiSplitter {
 
   constructor(root: HTMLElement, options: Partial<MojiSplitterOptions> = {}) {
     this.#rootElement = root;
-    this.#settings = { ...this.#defaults, ...options };
+    this.#settings = this.#resolveOptions(this.#defaults, options);
     this.#original = this.#rootElement.innerHTML;
     this.#initialize();
   }
@@ -424,5 +424,41 @@ class MojiSplitter {
     } else {
       return this.#segmenter;
     }
+  }
+
+  #resolveOptions(
+    target: MojiSplitterOptions,
+    source: Partial<MojiSplitterOptions>,
+  ): MojiSplitterOptions {
+    const merged = { ...target, ...source };
+    const defaults = this.#defaults;
+
+    if (typeof merged.concatChar !== 'boolean') {
+      const concatChar = defaults.concatChar;
+      console.warn(`Invalid concatChar option. Fallback: ${concatChar}.`);
+      merged.concatChar = concatChar;
+    }
+
+    if (typeof merged.noInlineStyle !== 'boolean') {
+      const noInlineStyle = defaults.noInlineStyle;
+      console.warn(`Invalid noInlineStyle option. Fallback: ${noInlineStyle}.`);
+      merged.noInlineStyle = noInlineStyle;
+    }
+
+    if (typeof merged.noLineBreakingRules !== 'boolean') {
+      const noLineBreakingRules = defaults.noLineBreakingRules;
+      console.warn(
+        `Invalid noLineBreakingRules option. Fallback: ${noLineBreakingRules}.`,
+      );
+      merged.noLineBreakingRules = noLineBreakingRules;
+    }
+
+    if (typeof merged.wordSegmenter !== 'boolean') {
+      const wordSegmenter = defaults.wordSegmenter;
+      console.warn(`Invalid wordSegmenter option. Fallback: ${wordSegmenter}.`);
+      merged.wordSegmenter = wordSegmenter;
+    }
+
+    return merged;
   }
 }
